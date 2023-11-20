@@ -15,6 +15,7 @@
     "@remix-run/node": "^2",
     "@remix-run/react": "^2",
     "@remix-run/serve": "^2",
+    "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^2.4.3",
     "isbot": "^3.6.13",
     "match-sorter": "^6.3.1",
