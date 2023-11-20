@@ -1,6 +1,8 @@
 import { Link } from "@remix-run/react";
-import React from "react";
 import { PATH_PAGE } from "~/config/path";
+
+
+
 
 const LoginPage = () => {
   return (
