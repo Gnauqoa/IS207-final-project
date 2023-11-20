@@ -26,7 +26,7 @@ async function seed() {
             ...userData,
             ...userCreatedUpdated,
             password: {
-              create: createPassword(userData.username),
+              create: createPassword(userData.email),
             },
             // image: {
             // 	create: {
