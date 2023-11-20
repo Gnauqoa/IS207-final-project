@@ -95,3 +95,8 @@ export async function verifyLogin(
     email: userWithPassword.email,
   };
 }
+
+export async function getPasswordHash(password: string) {
+	const hash = await bcrypt.hash(password, 10)
+	return hash
+}

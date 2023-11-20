@@ -1,15 +1,5 @@
 import { z } from 'zod'
 
-export const usernameSchema = z
-	.string()
-	.min(3, { message: 'Tên thiệt quá ngắn' })
-	.max(100, { message: 'Tên thiệt quá dài' })
-	.regex(/^[a-zA-Z0-9_@.]+$/, {
-		message: 'Tên thiệt chỉ có thể chứa chữ không dấu, số, gạch dưới, @ và . dùng để đăng nhập',
-	})
-	// users can type the username in any case, but we store it in lowercase
-	.transform(value => value.toLowerCase())
-
 export const passwordSchema = z
 	.string()
 	.min(6, { message: 'Mật khẩu quá ngắn' })

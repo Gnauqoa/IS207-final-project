@@ -1,7 +1,7 @@
 import dayjs from "~/config/dayjs";
 import { json, type ActionFunctionArgs, redirect } from "@remix-run/node";
 import { z } from "zod";
-import { passwordSchema, usernameSchema } from "~/utils/user-validation";
+import { passwordSchema, emailSchema } from "~/utils/user-validation";
 import { parse } from "@conform-to/zod";
 import { authenticator } from "~/utils/auth.server";
 import { FormStrategy } from "remix-auth-form";
@@ -12,7 +12,7 @@ import { commitSession, getSession } from "~/utils/session.server";
 import { sendEmailVerify, verificationType } from "~/utils/signup-email.server";
 
 export const loginFormSchema = z.object({
-  username: usernameSchema,
+  email: emailSchema,
   password: passwordSchema,
   redirectTo: z.string().optional(),
   remember: z.string().transform((value) => value === "on"),

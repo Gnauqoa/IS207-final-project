@@ -8,6 +8,7 @@ import {
 import Layout from "./layout";
 import stylesheet from "~/tailwind.css";
 import { type LinksFunction } from "@remix-run/node";
+import MUIThemeProvider from "./config/themeMui";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
@@ -22,7 +23,9 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Layout />
+        <MUIThemeProvider>
+          <Layout />
+        </MUIThemeProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
