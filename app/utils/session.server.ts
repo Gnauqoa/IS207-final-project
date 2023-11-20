@@ -4,23 +4,24 @@ import bcrypt from "bcryptjs";
 import { db } from "./db.server";
 
 type LoginForm = {
-  username: string;
+  email: string;
   password: string;
 };
 
-export async function login({ username, password }: LoginForm) {
+export async function login({ email, password }: LoginForm) {
   const user = await db.user.findUnique({
-    where: { username },
+    where: { email },
+    select: { id: true, password: { select: { hash: true } } },
   });
-  if (!user) {
+  if (!user || !user.password) {
     return null;
   }
-  const isCorrectPassword = await bcrypt.compare(password, user.passwordHash);
+  const isCorrectPassword = await bcrypt.compare(password, user.password?.hash);
   if (!isCorrectPassword) {
     return null;
   }
 
-  return { id: user.id, username };
+  return { id: user.id, email };
 }
 
 const sessionSecret = process.env.SESSION_SECRET;
