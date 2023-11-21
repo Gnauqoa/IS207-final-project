@@ -1,6 +1,7 @@
 import React from "react";
 import Auth from "./auth";
-import { Outlet, useLocation } from "@remix-run/react";
+import {  useLocation } from "@remix-run/react";
+import Main from "./main";
 
 const Layout: React.FC = () => {
   const location = useLocation();
@@ -9,11 +10,7 @@ const Layout: React.FC = () => {
 
   // Add other layout conditions here if needed
 
-  return (
-    <div>
-      <Outlet />
-    </div>
-  );
+  return <Main />;
 };
 
 export default Layout;
