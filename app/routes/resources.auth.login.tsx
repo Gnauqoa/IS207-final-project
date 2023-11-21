@@ -15,7 +15,10 @@ export const loginFormSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   redirectTo: z.string().optional(),
-  remember: z.string().transform((value) => value === "on"),
+  remember: z
+    .string()
+    .optional()
+    .transform((value) => value === "on"),
 });
 
 export const action = async ({ request }: ActionFunctionArgs) => {

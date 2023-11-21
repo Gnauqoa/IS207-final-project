@@ -5,6 +5,9 @@ import { FormStrategy } from "remix-auth-form";
 import { prisma } from "~/utils/db.server";
 import { invariant } from "./misc";
 import { sessionStorage } from "./session.server";
+import { redirect } from "@remix-run/node";
+import dayjs from "dayjs";
+import { PATH_PAGE } from "~/config/path";
 
 export type { User };
 export const CONTENT_LIMIT_FOR_GUEST = 1;
@@ -97,6 +100,60 @@ export async function verifyLogin(
 }
 
 export async function getPasswordHash(password: string) {
-	const hash = await bcrypt.hash(password, 10)
-	return hash
+  const hash = await bcrypt.hash(password, 10);
+  return hash;
 }
+export async function getUserId(request: Request) {
+  const sessionId = await authenticator.isAuthenticated(request);
+  if (!sessionId) return null;
+  const session = await prisma.session.findUnique({
+    where: { id: sessionId },
+    select: { userId: true },
+  });
+  if (!session) {
+    // Perhaps their session was deleted?
+    await authenticator.logout(request, { redirectTo: "/" });
+    return null;
+  }
+  return session.userId;
+}
+export async function requireUserId(
+  request: Request,
+  { redirectTo }: { redirectTo?: string | null } = {}
+) {
+  const requestUrl = new URL(request.url);
+  redirectTo =
+    redirectTo === null
+      ? null
+      : redirectTo ?? `${requestUrl.pathname}${requestUrl.search}`;
+  const loginParams = redirectTo
+    ? new URLSearchParams([["redirectTo", redirectTo]])
+    : null;
+  const failureRedirect = [PATH_PAGE.login, loginParams?.toString()]
+    .filter(Boolean)
+    .join("?");
+  const sessionId = await authenticator.isAuthenticated(request, {
+    failureRedirect,
+  });
+  const session = await prisma.session.findFirst({
+    where: { id: sessionId },
+    select: {
+      userId: true,
+      user: { select: { verified: true, createdAt: true } },
+      expirationDate: true,
+    },
+  });
+
+  if (!session) {
+    throw redirect(failureRedirect);
+  }
+  const expired =
+    session.user?.createdAt &&
+    !session.user.verified &&
+    dayjs().diff(dayjs(session.user.createdAt), "hour") > 48;
+  if (expired) throw redirect(failureRedirect);
+  return session.userId;
+}
+export const authGuard = async (request: Request, redirectTo?: string) => {
+  return await requireUserId(request, { redirectTo });
+};
