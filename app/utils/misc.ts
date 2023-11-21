@@ -2,7 +2,7 @@ import { useFormAction, useNavigation } from "@remix-run/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export function getUserImgSrc(imageId?: string | null) {
-  return imageId ? `/resources/file/${imageId}` : `/img/user.jpg`;
+  return imageId ? `/resources/image/${imageId}` : `/img/user.jpg`;
 }
 
 export function getErrorMessage(error: unknown) {

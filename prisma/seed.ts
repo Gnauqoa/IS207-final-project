@@ -1,3 +1,4 @@
+import fs from "fs";
 import { faker } from "@faker-js/faker";
 import { createPassword, createUser } from "tests/db-utils";
 import { prisma } from "~/utils/db.server";
@@ -18,18 +19,14 @@ async function seed() {
     data: {
       email: "kody@kcd.dev",
       name: "Kody",
-      // image: {
-      //   create: {
-      //     contentType: "image/png",
-      //     file: {
-      //       create: {
-      //         blob: await fs.promises.readFile(
-      //           "./tests/fixtures/images/user/kody.png"
-      //         ),
-      //       },
-      //     },
-      //   },
-      // },
+      avatar: {
+        create: {
+          contentType: "image/png",
+          blob: await fs.promises.readFile(
+            "./tests/fixtures/images/user/kody.png"
+          ),
+        },
+      },
       password: {
         create: {
           hash: await getPasswordHash("123456"),
@@ -55,18 +52,14 @@ async function seed() {
             password: {
               create: createPassword(userData.email),
             },
-            // image: {
-            // 	create: {
-            // 		contentType: 'image/jpeg',
-            // 		file: {
-            // 			create: {
-            // 				blob: await fs.promises.readFile(
-            // 					`./tests/fixtures/images/user/${index % 10}.jpg`,
-            // 				),
-            // 			},
-            // 		},
-            // 	},
-            // },
+            avatar: {
+              create: {
+                contentType: "image/jpeg",
+                blob: await fs.promises.readFile(
+                  `./tests/fixtures/images/user/${index % 10}.jpg`
+                ),
+              },
+            },
 
             questions: {
               create: {

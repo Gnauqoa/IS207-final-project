@@ -26,8 +26,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
               email: true,
               id: true,
               name: true,
-              // imageId: true,
-              // image: { select: { file: { select: { url: true } } } },
+              avatar: { select: { blob: true } },
 
               questions: {
                 select: { id: true },

@@ -9,7 +9,9 @@ import Layout from "./layout";
 import stylesheet from "~/tailwind.css";
 import { type LinksFunction } from "@remix-run/node";
 import MUIThemeProvider from "./config/themeMui";
+import { loader } from "./routes/resources.root";
 
+export { loader };
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
