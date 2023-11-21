@@ -4,6 +4,7 @@ import {
   Meta,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import Layout from "./layout";
 import stylesheet from "~/tailwind.css";
@@ -16,6 +17,8 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 export default function App() {
+  const data = useLoaderData<typeof loader>()
+
   return (
     <html lang="en">
       <head>
@@ -24,10 +27,19 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body
+        className={
+          "h-screen w-full overflow-auto bg-background text-foreground"
+        }
+      >
         <MUIThemeProvider>
           <Layout />
         </MUIThemeProvider>
+        <script
+					dangerouslySetInnerHTML={{
+						__html: `window.ENV = ${JSON.stringify(data.ENV)}`,
+					}}
+				/>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

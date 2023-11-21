@@ -12,11 +12,14 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import { useOptionalUser } from "~/utils/user";
+import { getUserImgSrc } from "~/utils/misc";
 
 const pages = ["Questions", "Answers"];
 const settings = ["Logout"];
 
 function ResponsiveAppBar() {
+  const user = useOptionalUser();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -139,7 +142,7 @@ function ResponsiveAppBar() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="Remy Sharp" src={getUserImgSrc(user?.avatarId)} />
               </IconButton>
             </Tooltip>
             <Menu
