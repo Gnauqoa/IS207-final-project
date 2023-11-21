@@ -12,9 +12,10 @@ import Container from "@mui/material/Container";
 import { useSearchParams } from "@remix-run/react";
 import { useFetcher } from "react-router-dom";
 import { type action, loginFormSchema } from "./resources.auth.login";
-import { useForm } from "@conform-to/react";
+import { conform, useForm } from "@conform-to/react";
 import { getFieldsetConstraint, parse } from "@conform-to/zod";
 import { PATH_PAGE } from "~/config/path";
+import useToggle from "~/hooks/useToggle";
 
 function Copyright(props: any) {
   return (
@@ -41,6 +42,7 @@ export default function SignIn({
   formError?: string | null;
 }) {
   const [searchParams] = useSearchParams();
+  const { toggle, handleToggle } = useToggle({});
   const loginFetcher = useFetcher<typeof action>();
   const [form, fields] = useForm({
     id: "inline-login",
@@ -74,36 +76,64 @@ export default function SignIn({
           method="POST"
           action={"/resources/auth/login"}
           name="login"
-          className="relative flex h-full w-full flex-col items-center justify-center gap-6"
+          className="relative flex h-full w-full flex-col justify-center gap-6"
           {...form.props}
         >
+          <input
+            value={toggle ? "on" : ""}
+            className="hidden"
+            onChange={() => {}}
+            {...conform.input(fields.remember)}
+          />
           <input name="redirectTo" hidden defaultValue={PATH_PAGE.root} />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            helperText={!!fields.email.error}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            helperText={!!fields.password.error}
-          />
+          <div className="flex flex-col gap-1">
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+            />
+            {fields.email.errors &&
+              fields.email.errors.map((error, index) => (
+                <Typography
+                  sx={{ fontSize: 12, color: "red" }}
+                  key={error + index}
+                >
+                  {error}
+                </Typography>
+              ))}
+          </div>
+          <div className="flex flex-col gap-1">
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+            />
+            {fields.password.errors &&
+              fields.password.errors.map((error, index) => (
+                <Typography
+                  sx={{ fontSize: 12, color: "red" }}
+                  key={error + index}
+                >
+                  {error}
+                </Typography>
+              ))}
+          </div>
+
           <FormControlLabel
+            value={toggle}
+            onChange={handleToggle}
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
-            name="remember"
           />
           <Button
             type="submit"

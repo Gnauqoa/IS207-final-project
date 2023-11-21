@@ -1,4 +1,3 @@
-import fs from "fs";
 import { faker } from "@faker-js/faker";
 import { createPassword, createUser } from "tests/db-utils";
 import { prisma } from "~/utils/db.server";
@@ -12,7 +11,35 @@ async function seed() {
   console.time("🧹 Cleaned up the database...");
   deleteAllData();
   console.timeEnd("🧹 Cleaned up the database...");
-
+  console.time(
+    `🐨 Created user "kody" with the password "123456" and admin role`
+  );
+  await prisma.user.create({
+    data: {
+      email: "kody@kcd.dev",
+      name: "Kody",
+      // image: {
+      //   create: {
+      //     contentType: "image/png",
+      //     file: {
+      //       create: {
+      //         blob: await fs.promises.readFile(
+      //           "./tests/fixtures/images/user/kody.png"
+      //         ),
+      //       },
+      //     },
+      //   },
+      // },
+      password: {
+        create: {
+          hash: await getPasswordHash("123456"),
+        },
+      },
+    },
+  });
+  console.timeEnd(
+    `🐨 Created user "kody" with the password "123456" and admin role`
+  );
   const totalUsers = 40;
   console.time(`👤 Created ${totalUsers} users...`);
   const users = await Promise.all(
@@ -67,64 +94,30 @@ async function seed() {
     })
     .then((users) => {
       Array.from(users, async (user) => {
-        return Array.from(
-          { length: faker.number.int({ min: 0, max: 3 }) },
-          async () => {
-            const answer = await prisma.answer.create({
-              data: {
-                question: {
-                  connect: {
-                    id: questions[
-                      faker.number.int({ min: 0, max: questions.length - 1 })
-                    ].id,
-                  },
+        return Array.from({ length: 1 }, async () => {
+          const answer = await prisma.answer.create({
+            data: {
+              question: {
+                connect: {
+                  id: questions[0].id,
+                  // faker.number.int({ min: 0, max: questions.length - 1 })
                 },
-                user: {
-                  connect: {
-                    id: user.id,
-                  },
-                },
-                content: faker.lorem.paragraphs(),
-                ...getCreatedAndUpdated(),
               },
-            });
-            return answer;
-          }
-        );
+              user: {
+                connect: {
+                  id: user.id,
+                },
+              },
+              content: faker.lorem.paragraphs(),
+              ...getCreatedAndUpdated(),
+            },
+          });
+          return answer;
+        });
       });
     });
 
   console.timeEnd(`👤 Created ${users.length} answers...`);
-
-  console.time(
-    `🐨 Created user "kody" with the password "kodylovesyou" and admin role`
-  );
-  await prisma.user.create({
-    data: {
-      email: "kody@kcd.dev",
-      name: "Kody",
-      // image: {
-      //   create: {
-      //     contentType: "image/png",
-      //     file: {
-      //       create: {
-      //         blob: await fs.promises.readFile(
-      //           "./tests/fixtures/images/user/kody.png"
-      //         ),
-      //       },
-      //     },
-      //   },
-      // },
-      password: {
-        create: {
-          hash: await getPasswordHash("kodylovesyou"),
-        },
-      },
-    },
-  });
-  console.timeEnd(
-    `🐨 Created user "kody" with the password "kodylovesyou" and admin role`
-  );
 
   console.timeEnd(`🌱 Database has been seeded`);
 }
