@@ -1,30 +1,25 @@
 import { parse } from "@conform-to/zod";
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { z } from "zod";
-import { answerSelect } from "~/components/Answer";
 import { authGuard } from "~/utils/auth.server";
 import { prisma } from "~/utils/db.server";
 
-export const AnswerEditSchema = z.object({
-  answerId: z.string().optional(),
-  content: z.string(),
+export const QuestionEditSchema = z.object({
   questionId: z.string().optional(),
+  content: z.string(),
 });
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const userId = await authGuard(request);
   const formData = await request.formData();
   const submission = parse(formData, {
-    schema: AnswerEditSchema,
+    schema: QuestionEditSchema,
   });
 
   if (submission.intent !== "submit") {
     return json({ status: "idle", submission } as const);
   }
-  if (
-    !submission.value ||
-    (!submission.value.answerId && !submission.value.questionId)
-  ) {
+  if (!submission.value) {
     return json(
       {
         status: "error",
@@ -34,24 +29,21 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
   if (submission.value.questionId) {
-    const answer = await prisma.answer.create({
-      data: {
-        questionId: submission.value.questionId,
-        content: submission.value.content,
-        userId: userId,
+    const question = await prisma.question.update({
+      where: {
+        id: submission.value.questionId,
       },
-      select: answerSelect,
+      data: {
+        content: submission.value.content,
+      },
     });
-    return json({ submission: answer, status: "success" }, { status: 201 });
+    return json({ submission: question, status: "success" }, { status: 201 });
   }
-  const answer = await prisma.answer.update({
-    where: {
-      id: submission.value.answerId,
-    },
+  const question = await prisma.question.create({
     data: {
       content: submission.value.content,
+      userId: userId,
     },
-    select: answerSelect,
   });
-  return json({ submission: answer, status: "success" }, { status: 201 });
+  return json({ submission: question, status: "success" }, { status: 201 });
 };

@@ -12,7 +12,6 @@ export const answerSelect: Prisma.AnswerSelect = {
       avatarId: true,
     },
   },
-  question: false,
   createdAt: true,
 };
 

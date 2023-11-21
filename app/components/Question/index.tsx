@@ -4,7 +4,7 @@ import Content from "../Content";
 import AnswerEditor from "./AddAnswer";
 import { EditorType } from "../Editor";
 import Answers from "./Answers";
-import { answerSelect } from "../Answer";
+import { useState } from "react";
 
 export const questionSelect: Prisma.QuestionSelect = {
   id: true,
@@ -16,7 +16,20 @@ export const questionSelect: Prisma.QuestionSelect = {
       avatarId: true,
     },
   },
-  answers: { select: answerSelect },
+  answers: {
+    select: {
+      id: true,
+      content: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          avatarId: true,
+        },
+      },
+      createdAt: true,
+    },
+  },
   createdAt: true,
 };
 
@@ -29,12 +42,22 @@ export type QuestionComponentType = SerializeFrom<
 >;
 
 const Question = ({ question }: { question: QuestionComponentType }) => {
-  if (!question) return <></>;
+  const [currentQuestion, setCurrentQuestion] = useState(question);
+  if (!currentQuestion) return <></>;
   return (
     <div className="flex flex-col w-full p-4 gap-2 border-b-[1px] border-gray-300">
-      <Content content={question} />
-      <AnswerEditor parentId={question.id} editorType={EditorType.new} />
-      <Answers answers={question.answers} />
+      <Content content={currentQuestion} />
+      <AnswerEditor
+        onSuccess={(data) =>
+          setCurrentQuestion((prev) => ({
+            ...prev,
+            answers: [data, ...prev.answers],
+          }))
+        }
+        parentId={currentQuestion.id}
+        editorType={EditorType.new}
+      />
+      <Answers answers={currentQuestion.answers} />
     </div>
   );
 };
