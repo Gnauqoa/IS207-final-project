@@ -1,11 +1,12 @@
 import dayjs from "~/config/dayjs";
-import { json, type ActionFunctionArgs } from "@remix-run/node";
+import { json, type ActionFunctionArgs, redirect } from "@remix-run/node";
 import { getUserId } from "~/utils/auth.server";
 import { makeTimings, time } from "~/utils/timing.server";
 import { prisma } from "~/utils/db.server";
 import { getEnv } from "~/utils/env.server";
 import { combineHeaders, getDomainUrl } from "~/utils/misc";
 import { getHints } from "~/utils/client-hints";
+import { PATH_PAGE } from "~/config/path";
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const timings = makeTimings("root loader");
@@ -14,7 +15,14 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     type: "getUserId",
     desc: "getUserId in root",
   });
+  const requestUrl = new URL(request.url);
 
+  if (!userId) {
+    if (!requestUrl.pathname.includes("/auth/login"))
+      return redirect(PATH_PAGE.login);
+  } else if (requestUrl.pathname.includes("/auth/login"))
+    return redirect(PATH_PAGE.login);
+    
   const user = userId
     ? await time(
         () =>

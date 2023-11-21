@@ -5,7 +5,7 @@ import Main from "./main";
 
 const Layout: React.FC = () => {
   const location = useLocation();
-
+  
   if (location.pathname.includes("auth")) return <Auth />;
 
   return <Main />;
